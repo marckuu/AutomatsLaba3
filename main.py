@@ -37,9 +37,6 @@ def countValue(alphabet, alphabetQ, graphTable, q, val):
                 continue
             res.append(k)
 
-
-    # Всегда переходит максимальное количство раз по Е, если есть путь Е - Е - а, то он не просчитает путь Е - а, если он будет
-
     # 2
     indxQ = alphabetQ.index(q)
     indxVal = alphabet.index(val)
@@ -65,10 +62,17 @@ def countValue(alphabet, alphabetQ, graphTable, q, val):
     return res
 
 
+def countValueForP(i, val, sTable, alphabet2):
+    res = set()
+    tempRes = sTable[i][alphabet2.index(val)]
+    for i in tempRes:
+        res.add(i)
+    return res
 
 
 from prettytable import PrettyTable
 #Ввод алфавита входных символов
+flag = False
 while True:
     inputData = input("Введите все символы алфавита подряд без пробелов(Е - принимается за эпислон):")
     alphabet = list(inputData)
@@ -94,6 +98,14 @@ while True:
             flag = True
             break
     if flag:
+        continue
+
+    flag3 = True
+    for i in alphabet:
+        if i == 'E' or i == "Е":
+            flag3 = False
+    if flag3:
+        print("В алфавите нет Е. Повторите ввод:")
         continue
 
     flag2 = False
@@ -218,14 +230,13 @@ while True:
     if choice == '1':
         break
 
+
 # Создаем массив, который хранит граф
 graphTable = []
 for i in range(len(alphabetQ)):
     graphTable.append([0] * len(alphabet))
 
 # Заполнение таблицы, которая описывает граф
-
-# ДОПИСАТЬ ЧТОБЫ МОНЖО БЫЛО ВВОДИТЬ БОЛЛЕ ОДНОЙ ВЕРШИНЫ В ТАБЛИЦУ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 for (i, a) in zip(alphabetQ, range(len(alphabetQ))):
     for (j, b) in zip(alphabet, range(len(alphabet))):
         while True:
@@ -265,26 +276,6 @@ for i in range(len(alphabetQ)):
 for a in alphabet:
     if a == 'E' or a == 'E':
         eIndx = alphabet.index(a)
-'''
-for i in range(len(alphabetQ)):
-    eTable[i].append(alphabetQ[i])
-    j = i
-    for d in graphTable[j][eIndx]:
-        eTable[i].append(d)
-        nextIndx = alphabetQ.index(d)
-        t = 0
-        while True:
-            if graphTable[j][eIndx][0] == '0':
-                break
-            while t > len(graphTable[j][eIndx]):
-                t -= 1
-            while t <= len(graphTable[j][eIndx]):
-                t += 1
-            t -= 1
-            eTable[i].append(graphTable[j][eIndx][t])
-            nextIndx = alphabetQ.index(graphTable[j][eIndx][t])
-            j = nextIndx
-'''
 
 for i in range(len(alphabetQ)):
     eTable[i].append(alphabetQ[i])
@@ -305,9 +296,7 @@ for i in range(len(alphabetQ)):
 #  Создание масиива для хранения таблицы с S
 sTable = []
 for i in range(len(eTable)):
-    sTable.append([0] * len(alphabet))
-
-
+    sTable.append([0] * (len(alphabet) - 1))
 
 # Подсчет значений для таблицы S
 tempData = set()
@@ -323,43 +312,158 @@ for i in range(len(alphabetQ)):
             for g in f:
                 tempData.add(g)  # Все вершины одной "ячейки" таблицы   УЧИТЫВАТЬ, ЧТО ЗДЕСЬ МОЖЕТ НИЧЕГО НЕ БЫТЬ, ТОГДА В ТАБЛИЦУ НУЖНО ДОБАВИТЬ 0
 
-        # Дописать проверку на вложенность и тогда добавлять элемент
+        # Проверка на вложенность
+        column = alphabet.index(k)
         if len(tempData) == 0:
             curElem.append('0')
-            print(curElem)
+            sTable[i][column] = curElem
         else:
             for w in range(len(eTable)):
                 is_subset = False
                 is_subset = set(eTable[w]).issubset(tempData)
                 if is_subset:
                     curElem.append("S" + str(w))
-            print(curElem)
-            print(tempData)
+            sTable[i][column] = curElem
         res = []
         curElem = []
         tempData = set()
 
-# Звполнять таблицу
-# Выводить таблицу
+
+# ДОПИСАТЬ УКАЗАНИЕ КАКОЙ ЭЛЕМЕНТ ЯВЛЯЕТСЯ НАЧАЛЬНЫМ А КАКОЙ КОНЕЧНЫМ !!!!!!!!!!!!!!!
+# Вывод таблицы с S
+alphabet2 = alphabet.copy()
+alphabet2.remove('E')
+
+mytable2 = PrettyTable()
+columns2 = alphabet2.copy()
+columns2.insert(0, "Состояние")
+mytable2.field_names = columns2
+for i in range(len(alphabetQ)):
+    strName2 = "S" + str(i)
+    string2 = sTable[i].copy()
+    string2.insert(0, strName2)
+    mytable2.add_row(string2)
+print(mytable2)
 
 
-''' 
-Берется множество из Е, одно из значений и проверяется на три исхода:
-1 в другую вершину можно пойти по переданному значению
-2 значение -> Е...
-3 Е - значение...
-каждая полученная вершина добавляется в множество, которое по итогу будет содержать неповторяющийся набор состояний, которые можно достичь 
+#Определение начального состояния
 
-далее множество сравнивается со списками из Е и таблица заполняется
-
-При этот стоит записать в ноый список какие S являются начальными, а какие - конечными
-'''
-
-
-                
+# Добавление начальных вершин, которые можно достичь по Е-переходу
+startVertex = set(startVertex)
+tempRes = []
+for j in startVertex:
+    elem = j
+    indx = alphabetQ.index(elem)
+    for i in eTable[indx]:
+        tempRes.append(i)
+for i in tempRes:
+    startVertex.add(i)
 
 
+# Добавление конечных вершин, которые можно достичь по Е-переходу
+endVertex = set(endVertex)
+tempRes = []
+for j in endVertex:
+    elem = j
+    indx = alphabetQ.index(elem)
+    for i in eTable[indx]:
+        tempRes.append(i)
+for i in tempRes:
+    endVertex.add(i)
+
+
+# Определение начальных S
+startS = set()
+for i in startVertex:
+    for j in eTable:
+        for k in j:
+            if k == i:
+                startS.add("S" + str(eTable.index(j)))
+
+
+# Определение конечных S
+endS = set()
+for i in endVertex:
+    for j in eTable:
+        for k in j:
+            if k == i:
+                endS.add("S" + str(eTable.index(j)))
 
 
 
 
+# Создание начального списка, который будет хранить из чего состоят элементы P
+pByS = []
+pByS.append(list(startS))
+
+# Создание начальной таблицы для хранения P
+pTable = []
+pTable.append([0] * len(alphabet2))
+
+
+# Нахождение элементов таблицы P
+res = set()
+count = 0
+for i in pByS:
+    i = pByS.index(i)
+    for k in alphabet2:
+        for j in pByS[i]:
+            tempRes = countValueForP(int(j[-1]), k, sTable, alphabet2)
+            for w in tempRes:
+                if w == '0':
+                    continue
+                res.add(w)
+        for t in res:
+            if t == '0':
+                count += 1
+        if count == len(res):
+            curElem = '0'
+        else:
+            localFlag = True
+            for w in pByS:
+                if set(w) == res:
+                    localFlag = False
+                    curElem = "P" + str(pByS.index(w))
+            if localFlag:
+                curElem = "P" + str(len(pByS))
+                pByS.append(list(res))
+                pTable.append([0] * len(alphabet2))
+        pTable[i][alphabet2.index(k)] = curElem  # Заполнение таблицы P
+        res = set()
+
+# Вывод таблицы P
+
+mytable3 = PrettyTable()
+columns3 = alphabet2.copy()
+columns3.insert(0, "Состояние")
+mytable3.field_names = columns3
+for i in range(len(pByS)):
+    strName3 = "P" + str(i)
+    string3 = pTable[i].copy()
+    string3.insert(0, strName3)
+    mytable3.add_row(string3)
+print(mytable3)
+
+
+# Определение начальных P
+startP = set()
+for i in startS:
+    for j in pByS:
+        for k in j:
+            if k == i:
+                startP.add("P" + str(pByS.index(j)))
+
+# Определение конечных P
+endP = set()
+for i in startS:
+    for j in pByS:
+        for k in j:
+            if k == i:
+                endP.add("P" + str(pByS.index(j))) # Добавляет P3 в список конечных вершин, а оно не является таковым
+
+print("Начальные состояния q:", startVertex)
+print("Конечные состояния q:", endVertex, '\n')
+print("Начальные состояния S:", startS)
+print("Конечные состояния S:", endS, '\n')
+print("Начальные состояния Р:", startP)
+print("Конечные состояния P:", endP)
