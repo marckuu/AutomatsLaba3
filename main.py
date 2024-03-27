@@ -1,3 +1,19 @@
+def add(i, graphTable, eIndx, alphabetQ):
+    res = []
+    for k in graphTable[i][eIndx]:
+        if k == '0':
+            res.append('0')
+            break
+        res.append(k)
+        nextIndx = alphabetQ.index(k)
+        res2 = add(nextIndx, graphTable, eIndx, alphabetQ)
+        for j in res2:
+            if j == '0':
+                continue
+            res.append(j)
+    return res
+
+
 def countValue(alphabet, alphabetQ, graphTable, q, val):
     res = []
     stop = False
@@ -15,11 +31,11 @@ def countValue(alphabet, alphabetQ, graphTable, q, val):
         indxQ = alphabetQ.index(graphTable[indxQ][indxVal])
         isGo = True
     if isGo:
-        while True:
-            if graphTable[indxQ][eIndx] == '0':
-                break
-            res.append(graphTable[indxQ][eIndx])
-            indxQ = alphabetQ.index(graphTable[indxQ][eIndx])
+        tempRes = add(indxQ, graphTable, eIndx, alphabetQ)
+        for k in tempRes:
+            if k == '0':
+                continue
+            res.append(k)
 
 
     # Всегда переходит максимальное количство раз по Е, если есть путь Е - Е - а, то он не просчитает путь Е - а, если он будет
@@ -30,20 +46,22 @@ def countValue(alphabet, alphabetQ, graphTable, q, val):
     isGo1 = False
     isGo = False
 
-    if graphTable[indxQ][eIndx] != '0': # ДОБАВИЛ FOR КОТОРЫЙ БУДЕТ ПРОХОДИТЬ ВСЕ ЭЭЛЕМЕНТЫ ПЕРВОГО ЭПСИЛОНА !!!!!!!
-        indxQ = alphabetQ.index(graphTable[indxQ][eIndx])
-        isGo1 = True
-    if isGo1:
-        if graphTable[indxQ][indxVal] != '0':
-            res.append(graphTable[indxQ][indxVal])
-       #     indxQ = alphabetQ.index(graphTable[indxQ][indxVal])
-            isGo = True
-    if isGo:
-        while True:     # ДОБАВИЛ FOR КОТОРЫЙ БУДЕТ ПРОХОДИТЬ ВСЕ ЭЭЛЕМЕНТЫ ПОСЛЕДНЕГО ЭПСИЛОНА !!!!!!!
-            if graphTable[indxQ][eIndx] == '0':
-                break
-            res.append(graphTable[indxQ][eIndx])
-            indxQ = alphabetQ.index(graphTable[indxQ][eIndx])
+    for d in graphTable[indxQ][eIndx]:
+        if d != '0': # ДОБАВИЛ FOR КОТОРЫЙ БУДЕТ ПРОХОДИТЬ ВСЕ ЭЭЛЕМЕНТЫ ПЕРВОГО ЭПСИЛОНА !!!!!!!
+            indxQ = alphabetQ.index(d)
+            isGo1 = True
+        if isGo1:
+            if graphTable[indxQ][indxVal] != '0':
+                res.append(graphTable[indxQ][indxVal])
+           #     indxQ = alphabetQ.index(graphTable[indxQ][indxVal])
+                isGo = True
+        if isGo:
+            for s in graphTable[indxQ][eIndx]:
+                while True:     # ДОБАВИЛ FOR КОТОРЫЙ БУДЕТ ПРОХОДИТЬ ВСЕ ЭЭЛЕМЕНТЫ ПОСЛЕДНЕГО ЭПСИЛОНА !!!!!!!
+                    if s == '0':
+                        break
+                    res.append(s)
+                    indxQ = alphabetQ.index(s)
     return res
 
 
@@ -217,7 +235,13 @@ for (i, a) in zip(alphabetQ, range(len(alphabetQ))):
                 print("Данной вершины нет в графе. Введите корректную вершину:")
                 continue
             break
-        graphTable[a][b] = currentValue
+        if j == 'E' or j == 'Е':
+            if currentValue == '0':
+                graphTable[a][b] = ['0']
+            else:
+                graphTable[a][b] = currentValue.split()
+        else:
+            graphTable[a][b] = currentValue
 
 
 # Вывод таблицы графа
@@ -238,22 +262,39 @@ for i in range(len(alphabetQ)):
     eTable.append([])
 
 # Нахождение Е-замыканий (Дописать в начале проверку на наличие эпсилонов)
-for i in range(len(alphabet)):
-    if i == 'E' or 'E':
-        eIndx = i
+for a in alphabet:
+    if a == 'E' or a == 'E':
+        eIndx = alphabet.index(a)
+'''
+for i in range(len(alphabetQ)):
+    eTable[i].append(alphabetQ[i])
+    j = i
+    for d in graphTable[j][eIndx]:
+        eTable[i].append(d)
+        nextIndx = alphabetQ.index(d)
+        t = 0
+        while True:
+            if graphTable[j][eIndx][0] == '0':
+                break
+            while t > len(graphTable[j][eIndx]):
+                t -= 1
+            while t <= len(graphTable[j][eIndx]):
+                t += 1
+            t -= 1
+            eTable[i].append(graphTable[j][eIndx][t])
+            nextIndx = alphabetQ.index(graphTable[j][eIndx][t])
+            j = nextIndx
+'''
 
 for i in range(len(alphabetQ)):
     eTable[i].append(alphabetQ[i])
-    for a in alphabet:
-        if a == 'E' or a == 'E':
-            eIndx = alphabet.index(a)
-    for j in range(i, len(alphabetQ)):
-        if graphTable[j][eIndx] == '0':
-            break
-        eTable[i].append(graphTable[j][eIndx])
-        nextIndx = alphabetQ.index(graphTable[j][eIndx])
-        j = nextIndx - 1
-
+    j = i
+    if graphTable[j][eIndx][0] == '0':
+        continue
+    else:
+        res = add(i, graphTable, eIndx, alphabetQ)
+        for k in res:
+            eTable[i].append(k)
 
 # Вывод таблицы с Е-замыканиями
 print("Е-замыкания:")
@@ -291,10 +332,9 @@ for i in range(len(alphabetQ)):
                 is_subset = False
                 is_subset = set(eTable[w]).issubset(tempData)
                 if is_subset:
-                    print("\n")
                     curElem.append("S" + str(w))
-                    print(curElem)
-                    print(tempData)
+            print(curElem)
+            print(tempData)
         res = []
         curElem = []
         tempData = set()
