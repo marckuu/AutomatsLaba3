@@ -181,7 +181,7 @@ while True:
 startVertex = []
 while True:
     inputDt = input("Укажите какая вершина является начальной:")
-    startVertex.append(inputDt)
+
 
     flag = True
     for i in alphabetQ:
@@ -191,6 +191,8 @@ while True:
     if flag:
         print("Данной вершины нет в указанном графе. Повторите ввод этой вершины")
         continue
+    startVertex.append(inputDt)
+
     while True:
         choice = input("Закончить ввод начальных вершин? Да - 1, Нет - 0: ")
         if choice == "1":
@@ -207,7 +209,6 @@ while True:
 endVertex = []
 while True:
     inputDt2 = input("Укажите какая вершина является конечной:")
-    endVertex.append(inputDt2)
 
     flag = True
     for i in alphabetQ:
@@ -217,6 +218,8 @@ while True:
     if flag:
         print("Данной вершины нет в указанном графе. Повторите ввод этой вершины")
         continue
+    endVertex.append(inputDt2)
+
     while True:
         choice = input("Закончить ввод конечных вершин? Да - 1, Нет - 0: ")
         if choice == "1":
@@ -455,7 +458,7 @@ for i in startS:
 
 # Определение конечных P
 endP = set()
-for i in startS:
+for i in endS:
     for j in pByS:
         for k in j:
             if k == i:
