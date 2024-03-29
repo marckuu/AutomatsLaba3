@@ -1,3 +1,5 @@
+from prettytable import PrettyTable
+
 def add(i, graphTable, eIndx, alphabetQ):
     res = []
     for k in graphTable[i][eIndx]:
@@ -22,7 +24,7 @@ def countValue(alphabet, alphabetQ, graphTable, q, val):
     indxVal = alphabet.index(val)
     for a in alphabet:
         if a == 'E' or a == 'E':
-            eIndx = alphabet.index(a)  # Дописать  проверку в начало на наличие Е
+            eIndx = alphabet.index(a)
 
 
     # 1
@@ -44,7 +46,7 @@ def countValue(alphabet, alphabetQ, graphTable, q, val):
     isGo = False
 
     for d in graphTable[indxQ][eIndx]:
-        if d != '0': # ДОБАВИЛ FOR КОТОРЫЙ БУДЕТ ПРОХОДИТЬ ВСЕ ЭЭЛЕМЕНТЫ ПЕРВОГО ЭПСИЛОНА !!!!!!!
+        if d != '0':
             indxQ = alphabetQ.index(d)
             isGo1 = True
         if isGo1:
@@ -54,7 +56,7 @@ def countValue(alphabet, alphabetQ, graphTable, q, val):
                 isGo = True
         if isGo:
             for s in graphTable[indxQ][eIndx]:
-                while True:     # ДОБАВИЛ FOR КОТОРЫЙ БУДЕТ ПРОХОДИТЬ ВСЕ ЭЭЛЕМЕНТЫ ПОСЛЕДНЕГО ЭПСИЛОНА !!!!!!!
+                while True:
                     if s == '0':
                         break
                     res.append(s)
@@ -70,15 +72,14 @@ def countValueForP(i, val, sTable, alphabet2):
     return res
 
 
-from prettytable import PrettyTable
-#Ввод алфавита входных символов
+# Ввод алфавита входных символов
 flag = False
 while True:
     inputData = input("Введите все символы алфавита подряд без пробелов(Е - принимается за эпислон):")
     alphabet = list(inputData)
 
-    # Проверки алфавита   ДОБАВИТЬ ПРОВЕРКУ НА НАЛИЧИЕ Е
 
+    # Проверки алфавита
     if len(alphabet) < 2:
         print("Алфавит содержит менее 2 элементов. Повторите ввод:")
         continue
@@ -126,8 +127,8 @@ while True:
     if int(isContinue):
         break
 
-# Ввод состояний q
 
+# Ввод состояний q
 while True:
     inputData = input("Введите все состояния q подряд через пробел:")
     alphabetQ = inputData.split()
@@ -176,8 +177,8 @@ while True:
     if int(isContinue):
         break
 
-# ВЫбор начальной и конечной вершин
 
+# Выбор начальной и конечной вершин
 startVertex = []
 while True:
     inputDt = input("Укажите какая вершина является начальной:")
@@ -239,12 +240,12 @@ graphTable = []
 for i in range(len(alphabetQ)):
     graphTable.append([0] * len(alphabet))
 
+
 # Заполнение таблицы, которая описывает граф
 for (i, a) in zip(alphabetQ, range(len(alphabetQ))):
     for (j, b) in zip(alphabet, range(len(alphabet))):
         while True:
-            # Дописать, чтобы можно было вводить 0
-            currentValue = input("Введите в какое состояние можно пойти из " + i + " по " + j + " (Если это невозможно, укажите 0): ")
+            currentValue = input("Введите в какое состояние можно пойти из " + i + " по " + j + " (Если это невозможно, укажите 0)(Если для Е нужно написать более 1 элемента, то напишите их через пробел):")
             if ((inputData.find(currentValue) == -1) and (currentValue != '0')) or currentValue == 'q':
                 print("Данной вершины нет в графе. Введите корректную вершину:")
                 continue
@@ -270,10 +271,12 @@ for i in range(len(alphabetQ)):
     mytable.add_row(string)
 print(mytable)
 
+
 # Создание массива для Е-замыканий
 eTable = []
 for i in range(len(alphabetQ)):
     eTable.append([])
+
 
 # Нахождение Е-замыканий (Дописать в начале проверку на наличие эпсилонов)
 for a in alphabet:
@@ -290,6 +293,7 @@ for i in range(len(alphabetQ)):
         for k in res:
             eTable[i].append(k)
 
+
 # Вывод таблицы с Е-замыканиями
 print("Е-замыкания:")
 for i in range(len(alphabetQ)):
@@ -301,6 +305,7 @@ sTable = []
 for i in range(len(eTable)):
     sTable.append([0] * (len(alphabet) - 1))
 
+
 # Подсчет значений для таблицы S
 tempData = set()
 res = []
@@ -310,10 +315,11 @@ for i in range(len(alphabetQ)):
         if k == "E":
             continue
         for j in range(len(eTable[i])):
-            res.append(countValue(alphabet, alphabetQ, graphTable, eTable[i][j], k)) # во время прохода q1,b выдает q2 и q3 хотя должно быть только q3
+            res.append(countValue(alphabet, alphabetQ, graphTable, eTable[i][j], k))
         for f in res:
             for g in f:
-                tempData.add(g)  # Все вершины одной "ячейки" таблицы   УЧИТЫВАТЬ, ЧТО ЗДЕСЬ МОЖЕТ НИЧЕГО НЕ БЫТЬ, ТОГДА В ТАБЛИЦУ НУЖНО ДОБАВИТЬ 0
+                tempData.add(g)
+
 
         # Проверка на вложенность
         column = alphabet.index(k)
@@ -332,7 +338,6 @@ for i in range(len(alphabetQ)):
         tempData = set()
 
 
-# ДОПИСАТЬ УКАЗАНИЕ КАКОЙ ЭЛЕМЕНТ ЯВЛЯЕТСЯ НАЧАЛЬНЫМ А КАКОЙ КОНЕЧНЫМ !!!!!!!!!!!!!!!
 # Вывод таблицы с S
 alphabet2 = alphabet.copy()
 alphabet2.remove('E')
@@ -399,6 +404,7 @@ for i in endVertex:
 pByS = []
 pByS.append(list(startS))
 
+
 # Создание начальной таблицы для хранения P
 pTable = []
 pTable.append([0] * len(alphabet2))
@@ -434,8 +440,8 @@ for i in pByS:
         pTable[i][alphabet2.index(k)] = curElem  # Заполнение таблицы P
         res = set()
 
-# Вывод таблицы P
 
+# Вывод таблицы P
 mytable3 = PrettyTable()
 columns3 = alphabet2.copy()
 columns3.insert(0, "Состояние")
@@ -464,6 +470,8 @@ for i in endS:
             if k == i:
                 endP.add("P" + str(pByS.index(j))) # Добавляет P3 в список конечных вершин, а оно не является таковым
 
+
+# Вывод всех начальных и конечных состояний для q, S, P
 print("Начальные состояния q:", startVertex)
 print("Конечные состояния q:", endVertex, '\n')
 print("Начальные состояния S:", startS)
