@@ -72,6 +72,16 @@ def countValueForP(i, val, sTable, alphabet2):
     return res
 
 
+def tryСhain(p, val, pTable, alphabet2):
+    indx = p[1:]
+    indx = int(indx)
+    while True:
+        if pTable[indx][alphabet2.index(val)] == '0':
+            return "1"
+        else:
+            return pTable[indx][alphabet2.index(val)]
+
+
 # Ввод алфавита входных символов
 flag = False
 while True:
@@ -478,3 +488,66 @@ print("Начальные состояния S:", startS)
 print("Конечные состояния S:", endS, '\n')
 print("Начальные состояния Р:", startP)
 print("Конечные состояния P:", endP)
+
+
+
+# Ввод цепочки символов и проверки
+while True:
+    inputData = input("Введите цепочку символов без пробелов:")
+    symbols = list(inputData)
+
+    flag = False
+    for i in symbols:
+        if i == 'q':
+            print("Алфавит не должен содержать q, т.к. через него обозначаются состояния. Повторите ввод:")
+            flag = True
+            break
+        if i == ' ':
+            print("Алфавит содержит пробел. Повторите ввод:")
+            flag = True
+            break
+    if flag:
+        continue
+
+    count = 0
+    for j in symbols:
+        for i in alphabet:
+            if j == i:
+                count += 1
+    if count != len(symbols):
+        print("Некоторых символов не поддерживаются автоматом. Повторите ввод: ")
+        continue
+
+    flag2 = False
+    print(symbols)
+    while True:
+        isContinue = input("Продолжить с этим алфавитом? Введите 1, чтобы продолжить, или 0, чтобы повторить ввод.\n")
+        if isContinue == "1":
+            break
+        if isContinue == "0":
+            flag2 = True
+            break
+        else:
+            print("Можно ввести только 1 или 0. Повторите выбор:")
+            continue
+    if flag2:
+        continue
+
+    if int(isContinue):
+        break
+
+
+# Проверка допускает ли автомат цепочку
+count = 0
+for i in startP:
+    tempI = i
+    for j in symbols:
+        res = tryСhain(tempI, j, pTable, alphabet2)
+        tempI = res
+        if res == '1':
+            count += 1
+            break
+if count >= len(startP):
+    print("Цепочка недопустима")
+else:
+    print("Цепочка допустима")
