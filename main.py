@@ -465,12 +465,7 @@ print(mytable3)
 
 
 # Определение начальных P
-startP = set()
-for i in startS:
-    for j in pByS:
-        for k in j:
-            if k == i:
-                startP.add("P" + str(pByS.index(j)))
+startP = "P0"
 
 # Определение конечных P
 endP = set()
@@ -491,63 +486,68 @@ print("Конечные состояния P:", endP)
 
 
 
-# Ввод цепочки символов и проверки
+# Цикл для проверки цепочек
 while True:
-    inputData = input("Введите цепочку символов без пробелов:")
-    symbols = list(inputData)
-
-    flag = False
-    for i in symbols:
-        if i == 'q':
-            print("Алфавит не должен содержать q, т.к. через него обозначаются состояния. Повторите ввод:")
-            flag = True
-            break
-        if i == ' ':
-            print("Алфавит содержит пробел. Повторите ввод:")
-            flag = True
-            break
-    if flag:
-        continue
-
-    count = 0
-    for j in symbols:
-        for i in alphabet:
-            if j == i:
-                count += 1
-    if count != len(symbols):
-        print("Некоторых символов не поддерживаются автоматом. Повторите ввод: ")
-        continue
-
-    flag2 = False
-    print(symbols)
+    # Ввод цепочки символов и проверки
     while True:
-        isContinue = input("Продолжить с этим алфавитом? Введите 1, чтобы продолжить, или 0, чтобы повторить ввод.\n")
-        if isContinue == "1":
-            break
-        if isContinue == "0":
-            flag2 = True
-            break
-        else:
-            print("Можно ввести только 1 или 0. Повторите выбор:")
+        inputData = input("Введите цепочку символов без пробелов:")
+        symbols = list(inputData)
+
+        flag = False
+        for i in symbols:
+            if i == 'q':
+                print("Алфавит не должен содержать q, т.к. через него обозначаются состояния. Повторите ввод:")
+                flag = True
+                break
+            if i == ' ':
+                print("Алфавит содержит пробел. Повторите ввод:")
+                flag = True
+                break
+        if flag:
             continue
-    if flag2:
-        continue
 
-    if int(isContinue):
-        break
+        count = 0
+        for j in symbols:
+            for i in alphabet:
+                if j == i:
+                    count += 1
+        if count != len(symbols):
+            print("Некоторых символов не поддерживаются автоматом. Повторите ввод: ")
+            continue
 
+        flag2 = False
+        print(symbols)
+        while True:
+            isContinue = input("Продолжить с этим алфавитом? Введите 1, чтобы продолжить, или 0, чтобы повторить ввод.\n")
+            if isContinue == "1":
+                break
+            if isContinue == "0":
+                flag2 = True
+                break
+            else:
+                print("Можно ввести только 1 или 0. Повторите выбор:")
+                continue
+        if flag2:
+            continue
 
-# Проверка допускает ли автомат цепочку
-count = 0
-for i in startP:
-    tempI = i
-    for j in symbols:
-        res = tryСhain(tempI, j, pTable, alphabet2)
-        tempI = res
-        if res == '1':
-            count += 1
+        if int(isContinue):
             break
-if count >= len(startP):
-    print("Цепочка недопустима")
-else:
-    print("Цепочка допустима")
+
+
+    # Проверка допускает ли автомат цепочку
+    localFlag = False
+    tempI = "P0"
+    for j in symbols:
+       res = tryСhain(tempI, j, pTable, alphabet2)
+       tempI = res
+       if res == '1':
+          localFlag = True
+          break
+    if localFlag:
+        print("Цепочка недопустима")
+    else:
+        print("Цепочка допустима")
+
+    data = input("Попробовать другую цепочку? Да - 1, Нет - любой другой символ: ")
+    if data != '1':
+        break
