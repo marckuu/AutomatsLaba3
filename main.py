@@ -539,14 +539,22 @@ while True:
     tempI = "P0"
     for j in symbols:
        res = tryСhain(tempI, j, pTable, alphabet2)
-       tempI = res
        if res == '1':
-          localFlag = True
-          break
+           for i in endP:
+               if i == tempI:
+                  localFlag = True
+           if localFlag:
+               break
+       tempI = res
+
+    if not localFlag:
+        for i in endP:
+            if i == tempI:
+                localFlag = True
     if localFlag:
-        print("Цепочка недопустима")
-    else:
         print("Цепочка допустима")
+    else:
+        print("Цепочка недопустима")
 
     data = input("Попробовать другую цепочку? Да - 1, Нет - любой другой символ: ")
     if data != '1':
